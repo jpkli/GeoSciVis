@@ -124,6 +124,7 @@ export default {
       center: [-95.7129, 37.0902], //center in USA
       zoom: 3
     })
+
     this.map.on('load', evt => {
       this.visualizeMapLayers(evt);
     })
@@ -157,19 +158,17 @@ export default {
 
     async geoTiff() {
       let url = this.dataServerUrl;
-      let geotiff = await this.numpy.get(`${url}/geotiff/data`);
-      let bounds = await axios.get(`${url}/geotiff/bound`);
-      let bound = bounds.data
-      let min = geotiff.data.filter(d => d !== -9999).reduce((a, b) => (a < b) ? a : b)
-      let max = geotiff.data.filter(d => d !== -9999).reduce((a, b) => (a > b) ? a : b)
-
+      let geotiff = await axios.get(`${url}/geotiff/data`);
+      let specs = await axios.get(`${url}/geotiff/specs`);
+      let spec = specs.data
       let geotiffLayer = new GeoPrint({
-        bound,
-        width: geotiff.shape[1],
-        height: geotiff.shape[0],
-        data: geotiff.data,
-        dataDomain: [min, max], 
-        colorMap: 'RdYlBu', //'RdBu',
+        bound: spec.bounds,
+        width: spec.dimensions.x,
+        height: spec.dimensions.y,
+        dataspd: geotiff.data.speed,
+        datavel: geotiff.data.velocity,
+        dataDomain: [[spec.minmax_vectors.u[0], spec.minmax_vectors.u[1]], [spec.minmax_vectors.v[0], spec.minmax_vectors.v[1]]], 
+        colorMap: 'BuRd', //'RdYlBu', //'RdBu',
         coordinateMap: Mapbox.MercatorCoordinate.fromLngLat
       });
 
@@ -180,9 +179,14 @@ export default {
           geotiffLayer.init(gl);
         },
         render(gl, matrix) {
-          geotiffLayer.render(matrix);
+          var updater = function() {
+            geotiffLayer.draw();
+            requestAnimationFrame(updater);
+          };
+          geotiffLayer.setMatrix(matrix);
+          updater();
         },
-        bound
+        bound: spec.bounds
       }
     }
   }
