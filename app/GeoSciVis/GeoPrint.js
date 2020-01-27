@@ -18,35 +18,35 @@ function createShader(gl, type, source) {
     return shader;
 }
 
-function createProgram(gl, vertexSource, fragmentSource) {
-    var program = gl.createProgram();
+// function createProgram(gl, vertexSource, fragmentSource) {
+//     var program = gl.createProgram();
 
-    var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
-    var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+//     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
+//     var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
 
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
+//     gl.attachShader(program, vertexShader);
+//     gl.attachShader(program, fragmentShader);
 
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error(gl.getProgramInfoLog(program));
-    }
+//     gl.linkProgram(program);
+//     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+//         throw new Error(gl.getProgramInfoLog(program));
+//     }
 
-    var wrapper = {program: program};
+//     var wrapper = {program: program};
 
-    var numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
-    for (var i = 0; i < numAttributes; i++) {
-        var attribute = gl.getActiveAttrib(program, i);
-        wrapper[attribute.name] = gl.getAttribLocation(program, attribute.name);
-    }
-    var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-    for (var i$1 = 0; i$1 < numUniforms; i$1++) {
-        var uniform = gl.getActiveUniform(program, i$1);
-        wrapper[uniform.name] = gl.getUniformLocation(program, uniform.name);
-    }
+//     var numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+//     for (var i = 0; i < numAttributes; i++) {
+//         var attribute = gl.getActiveAttrib(program, i);
+//         wrapper[attribute.name] = gl.getAttribLocation(program, attribute.name);
+//     }
+//     var numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+//     for (var i$1 = 0; i$1 < numUniforms; i$1++) {
+//         var uniform = gl.getActiveUniform(program, i$1);
+//         wrapper[uniform.name] = gl.getUniformLocation(program, uniform.name);
+//     }
 
-    return wrapper;
-}
+//     return wrapper;
+// }
 
 function createTexture(gl, filter, data, width, height) {
     var texture = gl.createTexture();
@@ -184,7 +184,7 @@ export default class GeoPrint {
 
     gl.validateProgram(this.screenProgram);
     if ( !gl.getProgramParameter( this.screenProgram, gl.LINK_STATUS) ) {
-        var info = gl.getProgramInfoLog(this.screenProgram);
+        info = gl.getProgramInfoLog(this.screenProgram);
         throw 'Could not compile WebGL program. \n\n' + info;
     }
 
@@ -195,7 +195,7 @@ export default class GeoPrint {
 
     gl.validateProgram(this.updateProgram);
     if ( !gl.getProgramParameter( this.updateProgram, gl.LINK_STATUS) ) {
-        var info = gl.getProgramInfoLog(this.updateProgram);
+        info = gl.getProgramInfoLog(this.updateProgram);
         throw 'Could not compile WebGL program. \n\n' + info;
     }
 
@@ -220,7 +220,7 @@ export default class GeoPrint {
   }
 
   coordsToPixels () {
-    let coords = new Float32Array(this.bound.length * 2)
+    let coords = new Float32Array(this.bound.length * 2);
     console.log(this.bound);
     this.bound.forEach( (b, i) => {
       let coord = (typeof this.coordinateMap === 'function') 
