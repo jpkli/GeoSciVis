@@ -11,5 +11,5 @@ void main() {
     vec2 ramp_pos = vec2(
         fract(16.0 * speed_t),
         floor(16.0 * speed_t) / 16.0);
-    gl_FragColor = texture2D(u_color_ramp, ramp_pos);
+    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); //texture2D(u_color_ramp, ramp_pos);
 }

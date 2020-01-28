@@ -272,8 +272,11 @@ export default class GeoPrint {
     let colorBuf = new Uint8ClampedArray(4 * this.width * this.height);
     for (let j = 0; j < this.height; j++) {
         for (let i = 0; i < this.width; i++) {
+            colorBuf[(j * this.width + i) * 4 + 2] = 0;
+            colorBuf[(j * this.width + i) * 4 + 3] = 255;
             if (this.datavel[(j * this.width + i) * 2] < this.dataDomain[0][0] || this.datavel[(j * this.width + i) * 2] > this.dataDomain[0][1]) {
                 colorBuf[(j * this.width + i) * 4] = 0;
+                colorBuf[(j * this.width + i) * 4 + 3] = 0;
             }
             else {
                 colorBuf[(j * this.width + i) * 4] = Math.floor(255 * (this.datavel[(j * this.width + i) * 2] - this.dataDomain[0][0]) / (this.dataDomain[0][1] - this.dataDomain[0][0]));
@@ -281,12 +284,12 @@ export default class GeoPrint {
 
             if (this.datavel[(j * this.width + i) * 2 + 1] < this.dataDomain[1][0] || this.datavel[(j * this.width + i) * 2 + 1] > this.dataDomain[1][1]) {
                 colorBuf[(j * this.width + i) * 4 + 1] = 0;
+                colorBuf[(j * this.width + i) * 4 + 3] = 0;
             }
             else {
                 colorBuf[(j * this.width + i) * 4 + 1] = Math.floor(255 * (this.datavel[(j * this.width + i) * 2 + 1] - this.dataDomain[1][0]) / (this.dataDomain[1][1] - this.dataDomain[1][0]));
             }
-            colorBuf[(j * this.width + i) * 4 + 2] = 0;
-            colorBuf[(j * this.width + i) * 4 + 3] = 255;
+            
         }
     }
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -358,19 +361,22 @@ export default class GeoPrint {
   drawScreen() {
     var gl = this.gl;
     // draw the screen into a temporary framebuffer to retain it as the background on the next frame
-    bindFramebuffer(gl, this.framebuffer, this.screenTexture);
-    //was present in original code but not kelvin's version
+    //bindFramebuffer(gl, this.framebuffer, this.screenTexture);
     //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    this.drawTexture(this.backgroundTexture, this.fadeOpacity);
-    this.drawParticles();
+    //this.drawTexture(this.backgroundTexture, this.fadeOpacity);
+    //this.drawParticles();
     
-    bindFramebuffer(gl, null);
+    //bindFramebuffer(gl, null);
+    //gl.viewport(this.bound_specs.left, this.bound_specs.bottom, Math.abs(this.bound_specs.right - this.bound_specs.left), Math.abs(this.bound_specs.bottom - this.bound_specs.top));
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     // enable blending to support drawing on top of an existing background (e.g. a map)
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    this.drawTexture(this.screenTexture, 1.0);
+    this.drawTexture(this.windTexture, 1.0);
     gl.disable(gl.BLEND);
+
+    //gl.viewport(this.bound_specs.left, this.bound_specs.bottom, Math.abs(this.bound_specs.right - this.bound_specs.left), Math.abs(this.bound_specs.bottom - this.bound_specs.top));
 
     // save the current screen as the background for the next frame
     var temp = this.backgroundTexture;
@@ -415,7 +421,7 @@ export default class GeoPrint {
     gl.uniform2f(gl.getUniformLocation(program, "u_bound_min"), this.bound_specs.left, this.bound_specs.bottom);
     gl.uniform2f(gl.getUniformLocation(program, "u_bound_max"), this.bound_specs.right, this.bound_specs.top);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this._numParticles);
+    gl.drawArrays(gl.POINTS, 0, this._numParticles);
   }
 
   updateParticles() {
